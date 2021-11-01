@@ -34,6 +34,25 @@ async function run() {
         console.log("ok");
 
 
+
+        //POST 
+
+        app.post('/items', async (req, res) => {
+            const items = req.body;
+            console.log(items);
+            const doc = {
+                email: req.body.email,
+                username: req.body.username,
+                itemname: req.body.itemname,
+                description: req.body.description,
+                img: req.body.img
+            }
+            const result = await itemscollection.insertOne(doc)
+            console.log(result);
+            res.json(result)
+        })
+
+
         // Find data from database
         app.get('/items', async (req, res) => {
             const fooditem = await itemscollection.find({});
@@ -52,14 +71,16 @@ async function run() {
 
         // order post 
         app.post('/orders', async (req, res) => {
-
+            console.log(req);
             const orders = req.body;
-            console.log(orders);
+            console.log("All orders", orders);
             const doc = {
-                _id: ObjectId(req.body._id),
-                name: req.body.name,
+                email: req.body.email,
+                username: req.body.username,
+                itemname: req.body.itemname,
                 img: req.body.img,
-                description: req.body.description
+                description: req.body.description,
+                status: req.body.status
             }
             const result = await orderscollection.insertOne(doc);
             console.log("inserted", result);
@@ -84,6 +105,29 @@ async function run() {
             res.json(order)
         })
 
+        //Upadate
+        app.put('/orders/:id', async (req, res) => {
+            const id = req.params.id
+            console.log("working", id);
+            const filter = { _id: ObjectId(id) };
+            const updated = {
+                $set: {
+                    email: req.body.email,
+                    username: req.body.username,
+                    itemname: req.body.itemname,
+                    img: req.body.img,
+                    description: req.body.description,
+                    status: req.body.status
+
+                }
+            }
+            const result = await orderscollection.updateOne(filter, updated);
+            console.log(result);
+            res.json(result);
+
+
+        })
+
     }
     finally {
         // await client.close();
@@ -91,9 +135,6 @@ async function run() {
 
 }
 run().catch(console.dir);
-
-
-
 
 
 app.get('/', (req, res) => {
