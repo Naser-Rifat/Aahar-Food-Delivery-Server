@@ -31,12 +31,13 @@ async function run() {
         const database = await client.db('Food-Service');
         const itemscollection = await database.collection('items');
         const orderscollection = await database.collection('orders')
+        const foodblogscollection = await database.collection('food-blogs')
+        const getservicecollection = await database.collection('getservice')
         console.log("ok");
 
 
 
-        //POST 
-
+        //Insert orders
         app.post('/items', async (req, res) => {
             const items = req.body;
             console.log(items);
@@ -44,8 +45,9 @@ async function run() {
                 email: req.body.email,
                 username: req.body.username,
                 itemname: req.body.itemname,
+                price: req.body.price,
                 description: req.body.description,
-                img: req.body.img
+                img: req.body.img,
             }
             const result = await itemscollection.insertOne(doc)
             console.log(result);
@@ -80,7 +82,9 @@ async function run() {
                 itemname: req.body.itemname,
                 img: req.body.img,
                 description: req.body.description,
-                status: req.body.status
+                status: req.body.status,
+                address: req.body.address,
+                price: req.body.price
             }
             const result = await orderscollection.insertOne(doc);
             console.log("inserted", result);
@@ -88,14 +92,28 @@ async function run() {
 
         })
 
+        //fetch food-blog
+        app.get('/foodblogs', async (req, res) => {
+            const foodblogs = await foodblogscollection.find({})
+            const item = await foodblogs.toArray({});
+            res.json(item);
+        })
+
+
         // fetch orders
         app.get('/orders', async (req, res) => {
             const orders = await orderscollection.find({})
             const item = await orders.toArray({});
             res.json(item);
         })
+        // fetch how it works
+        app.get('/getservice', async (req, res) => {
+            const getservice = await getservicecollection.find({})
+            const result = await getservice.toArray({});
+            res.json(result);
+        })
 
-        //delets orders
+        //deletes orders
         app.delete('/orders/:id', async (req, res) => {
             const id = req.params.id;
             console.log(id);
@@ -117,7 +135,9 @@ async function run() {
                     itemname: req.body.itemname,
                     img: req.body.img,
                     description: req.body.description,
-                    status: req.body.status
+                    status: req.body.status,
+                    price: req.body.price,
+                    address: req.body.address
 
                 }
             }
